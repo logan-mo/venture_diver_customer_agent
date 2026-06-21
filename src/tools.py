@@ -28,21 +28,23 @@ def search_catalog(query: str):
     return matching_products
 
 
+def _get_order(order_id: str):
+    with open("orders.json", "r") as f:
+        orders = json.load(f)
+    return next((order for order in orders if order["order_id"] == order_id), None)
+
+
 @tool
 def get_order_details(order_id: str):
     """Reads orders.json and returns details for the given order_id."""
-
-    with open("orders.json", "r") as f:
-        orders = json.load(f)
-
-    return next((order for order in orders if order["order_id"] == order_id), None)
+    return _get_order(order_id)
 
 
 @tool
 def initiate_return(order_id: str, reason: str):
     """Mock function to initiate a return for an order, only if the order status is 'delivered'."""
 
-    order = get_order_details(order_id)
+    order = _get_order(order_id)
     if (
         order and order["status"] == "delivered"
     ):  # Hardcoding this constraint, as the model might halucinate
