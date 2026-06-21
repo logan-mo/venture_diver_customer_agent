@@ -11,9 +11,12 @@ Constraint: The agent must only call this if it has first verified via get_order
 
 import json
 import pandas as pd
+from langchain.tools import tool
 
 
+@tool
 def search_catalog(query: str):
+    """Reads products.json and returns items matching the query."""
     with open("products.json", "r") as f:
         products = json.load(f)
 
@@ -25,14 +28,20 @@ def search_catalog(query: str):
     return matching_products
 
 
+@tool
 def get_order_details(order_id: str):
+    """Reads orders.json and returns details for the given order_id."""
+
     with open("orders.json", "r") as f:
         orders = json.load(f)
 
-    return next((order for order in orders if order["id"] == order_id), None)
+    return next((order for order in orders if order["order_id"] == order_id), None)
 
 
+@tool
 def initiate_return(order_id: str, reason: str):
+    """Mock function to initiate a return for an order, only if the order status is 'delivered'."""
+
     order = get_order_details(order_id)
     if (
         order and order["status"] == "delivered"
